@@ -1,0 +1,3 @@
+﻿  Origem.cpp
+C:\Users\fstei\Desktop\Lista 03\HelloTransforms\Exercício 01\Origem.cpp(30,25): warning C4305: 'inicializando': truncamento de 'double' para 'float'
+  Exercício 01.vcxproj -> C:\Users\fstei\Desktop\Lista 03\HelloTransforms\Debug\Exercício 01.exe
