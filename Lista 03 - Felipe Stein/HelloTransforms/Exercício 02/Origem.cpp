@@ -2,6 +2,7 @@
 #include <string>
 #include <assert.h>
 #include <cmath>
+#include <ctime>
 
 using namespace std;
 
@@ -26,10 +27,6 @@ int setupGeometry();
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 800, HEIGHT = 600;
-
-const float pi = 3.14159;
-
-int nvertices = 100 + 1 + 1; //+ centro +cópia do 1
 
 // Função MAIN
 int main()
@@ -97,12 +94,6 @@ int main()
 	glUniformMatrix4fv(projLoc, 1, FALSE, glm::value_ptr(projection));
 
 	glm::mat4 model = glm::mat4(1);
-	glm::mat4 model2 = glm::mat4(1);
-	glm::mat4 model3 = glm::mat4(1);
-
-	//model = glm::translate(model, glm::vec3(400, 300, 0.0));
-	//model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//model = glm::scale(model, glm::vec3(200, 100, 1.0));
 
 	GLint modelLoc = glGetUniformLocation(shader->Program, "model");
 
@@ -122,18 +113,51 @@ int main()
 		glLineWidth(10);
 		glPointSize(10);
 
-		model = glm::mat4(1); //matriz identidade
+		for (int n = 0; n <= 6; n++)
+		{
+			if (n >= 6)
+			{
+				break;
+			}
 
-		model = glm::translate(model, glm::vec3(400, 300, 0.0));
-		//model = glm::rotate(model, (GLfloat)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(100, 100, 1.0));
+			for (int j = 0; j <= 6; j++)
+			{
+				if (j >= 6)
+				{
+					break;
+				}
 
-		//glm::radians(45.0f)
+				//// 0 a 1
+				float c1 = rand() % 256/255.0;
+				float c2 = rand() % 256/255.0;
+				float c3 = rand() % 256/255.0;
 
-		glUniformMatrix4fv(modelLoc, 1, FALSE, glm::value_ptr(model));
+				model = glm::mat4(1); //matriz identidade
+				model = glm::translate(model, glm::vec3(250 + (n * 110), 100 + (j * 60), 0.0));
+				model = glm::scale(model, glm::vec3(100, 100, 1.0));
+
+				glUniformMatrix4fv(modelLoc, 1, FALSE, glm::value_ptr(model));
+				glUniformMatrix4fv(projLoc, 1, FALSE, glm::value_ptr(projection));
+
+				// Chamada de desenho - drawcall
+				// Poligono Preenchido - GL_TRIANGLES
+				//glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f);
+				glUniform4f(colorLoc, c1, c2, c3 , 1.0f);
+				glBindVertexArray(VAO);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+				// Chamada de desenho - drawcall
+				// CONTORNO - GL_LINE_LOOP
+				//glUniform4f(colorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
+				//glDrawArrays(GL_POINTS, 0, 3);
+				//glDrawArrays(GL_POINTS, 3, 3);
+
+				glBindVertexArray(0);
+			}
+		}
 
 		//Aqui o código de correção do aspecto 
-		/*double ratio = width / (float) height;
+		double ratio = width / (float) height;
 		if (width >= height)
 		{
 			projection = glm::ortho(xmin*ratio, xmax*ratio, ymin, ymax, -1.0, 1.0);
@@ -142,60 +166,12 @@ int main()
 		{
 			ratio = height / (float) width;
 			projection = glm::ortho(xmin, xmax, ymin*ratio, ymax*ratio, -1.0, 1.0);
-		}*/
-
-		glUniformMatrix4fv(projLoc, 1, FALSE, glm::value_ptr(projection));
-
-		// Chamada de desenho - drawcall
-		// Poligono Preenchido - GL_TRIANGLES
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f);
-
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, nvertices);
-
-		// Chamada de desenho - drawcall
-		// CONTORNO - GL_LINE_LOOP
-		glUniform4f(colorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_POINTS, 0, nvertices);
-		glBindVertexArray(0);
-
-		// SEGUNDA GEOMETRIA //
-		glm::mat4 model2 = glm::mat4(1);
-		model2 = glm::translate(model2, glm::vec3(200, 150, 0.0)); // metade é 400, 300
-		model2 = glm::scale(model2, glm::vec3(100, 100, 1.0));
-		glUniformMatrix4fv(glGetUniformLocation(shader->Program, "model"), 1, FALSE, glm::value_ptr(model2));
-
-		// Poligono Preenchido - GL_TRIANGLES
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, nvertices);
-
-		// Chamada de desenho - drawcall
-		// CONTORNO - GL_LINE_LOOP
-		glUniform4f(colorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_POINTS, 0, nvertices);
-		glBindVertexArray(0);
-
-		// TERCEIRA GEOMETRIA //
-		glm::mat4 model3 = glm::mat4(1);
-		model3 = glm::translate(model3, glm::vec3(600, 415, 0.0)); // metade é 400, 300
-		model3 = glm::scale(model3, glm::vec3(100, 100, 1.0));
-		glUniformMatrix4fv(glGetUniformLocation(shader->Program, "model"), 1, FALSE, glm::value_ptr(model3));
-
-		// Poligono Preenchido - GL_TRIANGLES
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, nvertices);
-
-		// Chamada de desenho - drawcall
-		// CONTORNO - GL_LINE_LOOP
-		glUniform4f(colorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_POINTS, 0, nvertices);
-		glBindVertexArray(0);
+		}
 
 		// Troca os buffers da tela
 		glfwSwapBuffers(window);
 	}
+
 	// Pede pra OpenGL desalocar os buffers
 	glDeleteVertexArrays(1, &VAO);
 	// Finaliza a execução da GLFW, limpando os recursos alocados por ela
@@ -223,38 +199,21 @@ int setupGeometry()
 	// sequencial, já visando mandar para o VBO (Vertex Buffer Objects)
 	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
 	// Pode ser arazenado em um VBO único ou em VBOs separados
-	//GLfloat vertices[] = {
-	//	-0.5, -0.5, 0.0,
-	//	 0.5, -0.5, 0.0,
-	//	 0.0, 0.5, 0.0,
-	//	 //outro triangulo vai aqui
-	//};
+	GLfloat vertices[] = {
+		//-0.5, -0.5, 0.0,
+		// 0.5, -0.5, 0.0,
+		// 0.0, 0.5, 0.0,
+		 //outro triangulo vai aqui
 
-	GLfloat* vertices;
+				 // parede
+		 0.5f, 0.5f, 0.0f,  // esquerda
+		-0.5f, 0.0f, 0.0f,  // direita
+		 0.5f, 0.0f, 0.0f,  // topo 
 
-	vertices = new GLfloat[nvertices * 3]; //* nro de valores do(s) atributo(s)
-
-	//ponto do centro -- origem
-	vertices[0] = 0.0; //x
-	vertices[1] = 0.0; //y
-	vertices[2] = 0.0; //z
-
-	float angulo = 0.0;
-	float deltaAngulo = 2 * pi / (nvertices - 2);
-
-	int i = 3; //posição em vértices onde começa o segundo ponto
-
-	float raio = 0.5;
-
-	while (i < nvertices * 3)
-	{
-		vertices[i] = raio * cos(angulo); //x
-		vertices[i + 1] = raio * sin(angulo); //y
-		vertices[i + 2] = 0.0;
-
-		i += 3;
-		angulo += deltaAngulo;
-	}
+		 0.5f, 0.5f, 0.0f,  // esquerda
+		-0.5f, 0.5f, 0.0f,  // direita
+		-0.5f, 0.0f, 0.0f,  // topo
+	};
 
 	GLuint VBO, VAO;
 
@@ -263,7 +222,7 @@ int setupGeometry()
 	//Faz a conexão (vincula) do buffer como um buffer de array
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//Envia os dados do array de floats para o buffer da OpenGl
-	glBufferData(GL_ARRAY_BUFFER, (nvertices * 3) * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	//Geração do identificador do VAO (Vertex Array Object)
 	glGenVertexArrays(1, &VAO);
